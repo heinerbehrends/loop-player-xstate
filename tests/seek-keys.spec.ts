@@ -7,7 +7,7 @@ let page: Page;
 
 test.beforeAll(async ({ browser }) => {
   page = await browser.newPage();
-  await page.goto("http://localhost:5173/");
+  await page.goto("/");
   await waitForAudio(page);
 });
 
