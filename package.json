@@ -12,6 +12,7 @@
   },
   "dependencies": {
     "@tailwindcss/vite": "^4.0.7",
+    "@vitejs/plugin-react": "^4.3.4",
     "@xstate/graph": "^3.0.2",
     "@xstate/react": "^5.0.2",
     "react": "^19.0.0",
@@ -25,8 +26,9 @@
     "@types/node": "^22.13.1",
     "@types/react": "^19.0.8",
     "@types/react-dom": "^19.0.3",
-    "@vitejs/plugin-react-swc": "^3.5.0",
+    "babel-plugin-react-compiler": "19.0.0-beta-21e868a-20250216",
     "eslint": "^9.19.0",
+    "eslint-plugin-react-compiler": "19.0.0-beta-21e868a-20250216",
     "eslint-plugin-react-hooks": "^5.0.0",
     "eslint-plugin-react-refresh": "^0.4.18",
     "globals": "^15.14.0",
