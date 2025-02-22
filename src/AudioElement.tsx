@@ -1,14 +1,8 @@
 import { useRef } from "react";
 import { LoopPlayerContext } from "./ContextProvider";
-import { loopPlayerMachine } from "./machine";
-import { SnapshotFrom } from "xstate";
+import { Snapshot } from "./machine";
 
-const { useSelector, useActorRef } = LoopPlayerContext; 
-export type Snapshot = SnapshotFrom<typeof loopPlayerMachine>;
-  
-function getAudioFile(snapshot: Snapshot) {
-  return snapshot.context.audioFile;
-}
+const { useSelector, useActorRef } = LoopPlayerContext;
 
 export function AudioElement() {
   const audioRef = useRef<HTMLAudioElement>(null);
@@ -23,5 +17,14 @@ export function AudioElement() {
       src={audioFile}
     />
   );
-
 }
+
+function getAudioFile(snapshot: Snapshot) {
+  return snapshot.context.audioFile;
+}
+
+export type LoadedEvent = {
+  type: "LOADED";
+  ref: HTMLAudioElement | null;
+};
+

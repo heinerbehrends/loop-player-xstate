@@ -1,26 +1,7 @@
-import { assign, fromCallback, setup } from "xstate";
-
-type Context = {
-  audioFile: string;
-  ref: HTMLAudioElement | null;
-  currentTime: number;
-  timelineLeft: number;
-  timelineWidth: number;
-};
-
-type Event =
-  | {
-      type: "LOADED";
-      ref: HTMLAudioElement | null;
-    }
-  | {
-      type: "TOGGLE_PLAY";
-    }
-  | {
-      type: "TIMELINE_LOADED";
-      timelineLeft: number;
-      timelineWidth: number;
-    };
+import { assign, fromCallback, setup, SnapshotFrom } from "xstate";
+import { TogglePlayEvent } from "./PlayButton";
+import { LoadedEvent } from "./AudioElement";
+import { SeekEvent, TimelineLoadedEvent } from "./TimeLine";
 
 export const loopPlayerMachine = setup({
   types: {
@@ -65,14 +46,25 @@ export const loopPlayerMachine = setup({
         return event.timelineWidth;
       },
     }),
+    seek: ({ context, event }) => {
+      if (event.type !== "SEEK") {
+        return context.currentTime;
+      }
+      if (!context.ref) {
+        return;
+      }
+      context.ref.currentTime = event.time;
+    },
   },
   actors: {
     updateCurrentTime: fromCallback(({ sendBack }) => {
-      sendBack({ type: "UPDATE_CURRENT_TIME" });
-      const interval = setInterval(() => {
+      let frame: number;
+      const update = () => {
         sendBack({ type: "UPDATE_CURRENT_TIME" });
-      }, 50);
-      return () => clearInterval(interval);
+        frame = requestAnimationFrame(update);
+      };
+      frame = requestAnimationFrame(update);
+      return () => cancelAnimationFrame(frame);
     }),
   },
 }).createMachine({
@@ -103,6 +95,9 @@ export const loopPlayerMachine = setup({
           target: "playing",
           actions: "togglePlay",
         },
+        SEEK: {
+          actions: ["seek", "updateCurrentTime"],
+        },
       },
     },
     playing: {
@@ -114,6 +109,9 @@ export const loopPlayerMachine = setup({
         UPDATE_CURRENT_TIME: {
           actions: "updateCurrentTime",
         },
+        SEEK: {
+          actions: "seek",
+        },
       },
       invoke: {
         src: "updateCurrentTime",
@@ -122,3 +120,25 @@ export const loopPlayerMachine = setup({
     },
   },
 });
+
+type Context = {
+  audioFile: string;
+  ref: HTMLAudioElement | null;
+  currentTime: number;
+  timelineLeft: number;
+  timelineWidth: number;
+};
+
+export type Event =
+  | LoadedEvent
+  | TogglePlayEvent
+  | TimelineLoadedEvent
+  | UpdateCurrentTimeEvent
+  | SeekEvent;
+
+type UpdateCurrentTimeEvent = {
+  type: "UPDATE_CURRENT_TIME";
+  currentTime: number;
+};
+
+export type Snapshot = SnapshotFrom<typeof loopPlayerMachine>;

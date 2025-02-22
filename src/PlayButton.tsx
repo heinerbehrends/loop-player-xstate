@@ -1,11 +1,7 @@
-import { Snapshot } from "./AudioElement";
+import { Snapshot } from "./machine";
 import { LoopPlayerContext } from "./ContextProvider";
 
 const { useActorRef, useSelector } = LoopPlayerContext;
-
-function getState(snapshot: Snapshot) {
-  return snapshot.value;
-}
 
 const ariaLabel = {
   playing: "Pause audio",
@@ -29,3 +25,11 @@ export function PlayButton() {
     </button>
   );
 }
+
+function getState(snapshot: Snapshot) {
+  return snapshot.value;
+}
+
+export type TogglePlayEvent = {
+  type: "TOGGLE_PLAY";
+};
