@@ -1,13 +1,4 @@
 import { assign, fromCallback, setup, SnapshotFrom } from "xstate";
-import { TogglePlayEvent } from "./PlayButton";
-import { LoadedEvent } from "./AudioElement";
-import {
-  SeekEvent,
-  TimelineLoadedEvent,
-  DragEndEvent,
-  DraggingEvent,
-  DragStartEvent,
-} from "./TimeLine";
 
 export type Context = {
   audioFile: string;
@@ -73,7 +64,7 @@ export const loopPlayerMachine = setup({
     }),
     seek: ({ context, event }) => {
       if (event.type !== "SEEK" && event.type !== "DRAG_END") {
-        return context.currentTime;
+        return;
       }
       if (!context.ref) {
         return;
@@ -205,10 +196,46 @@ export const loopPlayerMachine = setup({
   },
 });
 
+export type LoadedEvent = {
+  type: "LOADED";
+  ref: HTMLAudioElement | null;
+};
 
 type UpdateCurrentTimeEvent = {
   type: "UPDATE_CURRENT_TIME";
   currentTime: number;
+};
+
+type TogglePlayEvent = {
+  type: "TOGGLE_PLAY";
+};
+
+type TimelineLoadedEvent = {
+  type: "TIMELINE_LOADED";
+  timelineLeft: number;
+  timelineWidth: number;
+};
+
+type SeekEvent = {
+  type: "SEEK";
+  time: number;
+};
+
+type DragStartEvent = {
+  type: "DRAG_START";
+  clientX: number;
+  element: "timeline";
+};
+
+type DraggingEvent = {
+  type: "DRAG";
+  clientX: number;
+};
+
+type DragEndEvent = {
+  type: "DRAG_END";
+  clientX: number;
+  time: number;
 };
 
 export type Snapshot = SnapshotFrom<typeof loopPlayerMachine>;
