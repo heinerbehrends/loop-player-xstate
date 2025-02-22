@@ -20,6 +20,7 @@ export function PlayButton() {
       disabled={state === "loading"}
       aria-pressed={isPlaying}
       aria-label={ariaLabel[state]}
+      className="rounded-full bg-white p-2 h-16 w-16 border-2 border-gray-300 aspect-square"
     >
       {state === "playing" ? "Pause" : "Play"}
     </button>
@@ -27,9 +28,5 @@ export function PlayButton() {
 }
 
 function getState(snapshot: Snapshot) {
-  return snapshot.value;
+  return snapshot.value.track;
 }
-
-export type TogglePlayEvent = {
-  type: "TOGGLE_PLAY";
-};
