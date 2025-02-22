@@ -15,16 +15,15 @@ export function AudioElement() {
       ref={audioRef}
       onCanPlay={() => send({ type: "LOADED", ref: audioRef.current })}
       src={audioFile}
-    />
+    >
+      <track kind="captions">
+        {/* TODO: add captions with metadata from the audio file */}
+      </track>
+    </audio>
   );
 }
 
 function getAudioFile(snapshot: Snapshot) {
   return snapshot.context.audioFile;
 }
-
-export type LoadedEvent = {
-  type: "LOADED";
-  ref: HTMLAudioElement | null;
-};
 
