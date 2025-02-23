@@ -1,5 +1,10 @@
 import { test, expect } from "@playwright/test";
-import { waitForAudio, getTimelineState, getAudioState } from "./test-utils";
+import {
+  waitForAudio,
+  getTimelineState,
+  getAudioState,
+  getButtonPosition,
+} from "./test-utils";
 
 const PRECISION = 0.25;
 
@@ -39,7 +44,7 @@ test("drag timeline button to seek while playing", async ({ page }) => {
   const { timelineWidth, duration, timelineLeft, currentTime } =
     await getTimelineState(page);
 
-  // Calculate where the button should be and move there
+  // Calculate where the button should be
   const currentOffset = (currentTime / duration) * timelineWidth;
   const buttonX = timelineLeft + currentOffset;
   const buttonY = await page.evaluate(() => {
@@ -67,14 +72,7 @@ test("drag button cannot move beyond timeline bounds", async ({ page }) => {
   await waitForAudio(page);
 
   // Get the timeline dimensions
-  const { timelineLeft, timelineWidth } = await page.evaluate(() => {
-    const timeline = document.querySelector("[data-testid='timeline']");
-    const rect = timeline?.getBoundingClientRect();
-    return {
-      timelineLeft: rect?.left ?? 0,
-      timelineWidth: rect?.width ?? 0,
-    };
-  });
+  const { timelineLeft, timelineWidth } = await getTimelineState(page);
 
   const dragButton = await page.getByLabel("Drag to seek");
   await dragButton.hover();
@@ -84,11 +82,7 @@ test("drag button cannot move beyond timeline bounds", async ({ page }) => {
   await page.mouse.move(timelineLeft - 100, 0);
 
   // Get button position, should be at start
-  let buttonLeft = await page.evaluate(() => {
-    const button = document.querySelector("[aria-label='Drag to seek']");
-    return button?.getBoundingClientRect().left ?? 0;
-  });
-
+  let buttonLeft = await getButtonPosition(page);
   // Button should be at start of timeline (minus its offset)
   expect(buttonLeft).toBeCloseTo(timelineLeft - 12, 1);
 
@@ -96,10 +90,7 @@ test("drag button cannot move beyond timeline bounds", async ({ page }) => {
   await page.mouse.move(timelineLeft + timelineWidth + 100, 0);
 
   // Get button position, should be at end
-  buttonLeft = await page.evaluate(() => {
-    const button = document.querySelector("[aria-label='Drag to seek']");
-    return button?.getBoundingClientRect().left ?? 0;
-  });
+  buttonLeft = await getButtonPosition(page);
 
   // Button should be at end of timeline (minus its offset)
   expect(buttonLeft).toBeCloseTo(timelineLeft + timelineWidth - 12, 1);
@@ -107,13 +98,7 @@ test("drag button cannot move beyond timeline bounds", async ({ page }) => {
   await page.mouse.up();
 
   // Verify audio times
-  const { currentTime, duration } = await page.evaluate(() => {
-    const audio = document.querySelector("audio");
-    return {
-      currentTime: audio?.currentTime ?? 0,
-      duration: audio?.duration ?? 0,
-    };
-  });
+  const { currentTime, duration } = await getAudioState(page);
 
   // Should be at end of timeline
   expect(currentTime).toBeCloseTo(duration, PRECISION);
