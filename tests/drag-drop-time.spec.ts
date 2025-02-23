@@ -1,5 +1,5 @@
 import { test, expect } from "@playwright/test";
-import { waitForAudio } from "./test-utils";
+import { waitForAudio, getTimelineState, getAudioState } from "./test-utils";
 
 const PRECISION = 0.25;
 
@@ -10,29 +10,19 @@ test("drag timeline button to seek when paused", async ({ page }) => {
   const dragButton = await page.getByLabel("Drag to seek");
 
   // Get the timeline width and audio duration
-  const [timelineWidth, duration] = await page.evaluate(() => {
-    const timeline = document.querySelector("[data-testid='timeline']");
-    const audio = document.querySelector("audio");
-    return [timeline?.getBoundingClientRect().width ?? 0, audio?.duration ?? 0];
-  });
+  const { timelineWidth, duration } = await getTimelineState(page);
 
   // Click anywhere on the button and drag
   await dragButton.hover();
   await page.mouse.down();
 
   // Move halfway across the timeline
-  const timelineLeft = await page.evaluate(() => {
-    const timeline = document.querySelector("[data-testid='timeline']");
-    return timeline?.getBoundingClientRect().left ?? 0;
-  });
+  const { timelineLeft } = await getTimelineState(page);
   await page.mouse.move(timelineLeft + timelineWidth / 2, 0);
   await page.mouse.up();
 
   // Verify the audio time was updated
-  const currentTime = await page.evaluate(() => {
-    const audio = document.querySelector("audio");
-    return audio?.currentTime ?? 0;
-  });
+  const { currentTime } = await getAudioState(page);
 
   // Should be at approximately half duration
   expect(currentTime).toBeCloseTo(duration / 2, PRECISION);
@@ -45,22 +35,9 @@ test("drag timeline button to seek while playing", async ({ page }) => {
   // Start playing
   await page.getByRole("button", { name: "Play audio" }).click();
 
-  // Get the timeline width and audio duration
-  const [timelineWidth, duration] = await page.evaluate(() => {
-    const timeline = document.querySelector("[data-testid='timeline']");
-    const audio = document.querySelector("audio");
-    return [timeline?.getBoundingClientRect().width ?? 0, audio?.duration ?? 0];
-  });
-
-  // Get current button position
-  const { currentTime, timelineLeft } = await page.evaluate(() => {
-    const timeline = document.querySelector("[data-testid='timeline']");
-    const audio = document.querySelector("audio");
-    return {
-      currentTime: audio?.currentTime ?? 0,
-      timelineLeft: timeline?.getBoundingClientRect().left ?? 0,
-    };
-  });
+  // Get the timeline state
+  const { timelineWidth, duration, timelineLeft, currentTime } =
+    await getTimelineState(page);
 
   // Calculate where the button should be and move there
   const currentOffset = (currentTime / duration) * timelineWidth;
@@ -75,19 +52,13 @@ test("drag timeline button to seek while playing", async ({ page }) => {
   await page.mouse.down();
 
   // Verify the audio time was updated
-  const currentTimeUpdated = await page.evaluate(() => {
-    const audio = document.querySelector("audio");
-    return audio?.currentTime ?? 0;
-  });
+  const { currentTime: currentTimeUpdated } = await getAudioState(page);
 
   // Should be at approximately current time
   expect(currentTimeUpdated).toBeCloseTo(currentTime, PRECISION);
 
   // Verify audio is still playing
-  const isPlaying = await page.evaluate(() => {
-    const audio = document.querySelector("audio");
-    return audio && !audio.paused;
-  });
+  const { isPlaying } = await getAudioState(page);
   expect(isPlaying).toBe(true);
 });
 

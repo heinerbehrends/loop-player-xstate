@@ -1,5 +1,5 @@
 import { test, expect, Page } from "@playwright/test";
-import { waitForAudio } from "./test-utils";
+import { waitForAudio, getTimelineState, getAudioState } from "./test-utils";
 
 const CLICK_OFFSET = 100;
 const PRECISION = 0.25;
@@ -20,13 +20,10 @@ test("jumps to correct position when paused", async () => {
   await page.getByTestId("timeline").click({
     position: { x: CLICK_OFFSET, y: 0 },
   });
-  const [timelineWidth, duration] = await page.evaluate(getTimelineData);
+  const { timelineWidth, duration } = await getTimelineState(page);
   const progress = CLICK_OFFSET / timelineWidth;
   const expectedTime = duration * progress;
-  const currentTime = await page.evaluate(() => {
-    const audio = document.querySelector("audio");
-    return audio?.currentTime;
-  });
+  const { currentTime } = await getAudioState(page);
   expect(currentTime).toBeCloseTo(expectedTime, PRECISION);
 });
 
@@ -36,18 +33,9 @@ test("jumps to correct position when playing", async () => {
     position: { x: CLICK_OFFSET, y: 0 },
   });
   await page.getByRole("button", { name: "Pause" }).click();
-  const [timelineWidth, duration] = await page.evaluate(getTimelineData);
+  const { timelineWidth, duration } = await getTimelineState(page);
   const progress = CLICK_OFFSET / timelineWidth;
   const expectedTime = duration * progress;
-  const currentTime = await page.evaluate(() => {
-    const audio = document.querySelector("audio");
-    return audio?.currentTime;
-  });
+  const { currentTime } = await getAudioState(page);
   expect(currentTime).toBeCloseTo(expectedTime, PRECISION);
 });
-
-function getTimelineData() {
-  const timeline = document.querySelector("[data-testid='timeline']");
-  const duration = document.querySelector("audio")?.duration;
-  return [timeline?.getBoundingClientRect().width ?? 1, duration ?? 0];
-}
