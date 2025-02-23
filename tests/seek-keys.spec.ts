@@ -1,5 +1,5 @@
 import { test, expect, Page } from "@playwright/test";
-import { waitForAudio } from "./test-utils";
+import { getAudioState, waitForAudio } from "./test-utils";
 
 const PRECISION = 0.25;
 
@@ -18,20 +18,14 @@ test.afterAll(async () => {
 test("seek to 10% of the timeline when 1 is pressed", async () => {
   await page.getByTestId("timeline").focus();
   await page.keyboard.press("1");
-  const [currentTime, duration] = await page.evaluate(() => {
-    const audio = document.querySelector("audio");
-    return [audio?.currentTime, audio?.duration ?? 0];
-  });
+  const { currentTime, duration } = await getAudioState(page);
   expect(currentTime).toBeCloseTo(duration * 0.1, PRECISION);
 });
 
 test("seek to 10sec ahead when right arrow is pressed", async () => {
   await page.getByTestId("timeline").focus();
   await page.keyboard.press("ArrowRight");
-  const [currentTime] = await page.evaluate(() => {
-    const audio = document.querySelector("audio");
-    return [audio?.currentTime];
-  });
+  const { currentTime } = await getAudioState(page);
   expect(currentTime).toBeCloseTo(10, PRECISION);
 });
 
@@ -39,10 +33,7 @@ test("seek to 10sec behind when left arrow is pressed", async () => {
   await page.getByTestId("timeline").focus();
   await page.keyboard.press("ArrowRight");
   await page.keyboard.press("ArrowLeft");
-  const [currentTime] = await page.evaluate(() => {
-    const audio = document.querySelector("audio");
-    return [audio?.currentTime];
-  });
+  const { currentTime } = await getAudioState(page);
   expect(currentTime).toBeCloseTo(0, PRECISION);
 });
 
