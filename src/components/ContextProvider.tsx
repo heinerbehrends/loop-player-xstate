@@ -1,5 +1,5 @@
 import { createActorContext } from "@xstate/react";
-import { loopPlayerMachine } from "./machine";
+import { loopPlayerMachine } from "../machine";
 
 export const LoopPlayerContext = createActorContext(loopPlayerMachine);
 

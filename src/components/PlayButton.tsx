@@ -1,4 +1,4 @@
-import { Snapshot } from "./machine";
+import { Snapshot } from "../machine";
 import { LoopPlayerContext } from "./ContextProvider";
 
 const { useActorRef, useSelector } = LoopPlayerContext;

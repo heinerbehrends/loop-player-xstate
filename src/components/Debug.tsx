@@ -1,5 +1,5 @@
 import { LoopPlayerContext } from "./ContextProvider";
-import { Snapshot } from "./machine";
+import { Snapshot } from "../machine";
 
 const { useSelector } = LoopPlayerContext;
 

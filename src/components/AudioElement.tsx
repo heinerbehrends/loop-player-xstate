@@ -1,6 +1,6 @@
 import { useRef } from "react";
 import { LoopPlayerContext } from "./ContextProvider";
-import { Snapshot } from "./machine";
+import { Snapshot } from "../machine";
 
 const { useSelector, useActorRef } = LoopPlayerContext;
 
@@ -26,4 +26,3 @@ export function AudioElement() {
 function getAudioFile(snapshot: Snapshot) {
   return snapshot.context.audioFile;
 }
-

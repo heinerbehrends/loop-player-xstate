@@ -1,7 +1,7 @@
 import { useEffect } from "react";
-import { LoopPlayerContext } from "./ContextProvider";
-import { Snapshot } from "./machine";
-import { handleTimelineKeys } from "./handleTimelineKeys";
+import { LoopPlayerContext } from "../ContextProvider";
+import { Snapshot } from "../../machine";
+import { handleTimelineKeys } from "../../handleTimelineKeys";
 
 const { useActorRef, useSelector } = LoopPlayerContext;
 
@@ -16,7 +16,7 @@ function getTimeDragData(snapshot: Snapshot) {
   };
 }
 
-export function TimeDragButton() {
+export function TimelineDragButton() {
   const { currentTime, duration, timelineWidth, dragXOffset, isDragging } =
     useSelector(getTimeDragData);
   const { send } = useActorRef();
