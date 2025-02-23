@@ -29,6 +29,7 @@ export function TimeDragButton() {
       style={{
         left: `calc(${offset}px - 12px)`,
       }}
+      aria-label="Drag to seek"
       onPointerDown={() => {
         send({
           type: "DRAG_START",
