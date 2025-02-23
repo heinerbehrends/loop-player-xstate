@@ -51,7 +51,7 @@ test("progress indicator initial state", async () => {
   await expect(progressIndicator).toBeEnabled();
   await expect(progressIndicator).toHaveAttribute(
     "aria-label",
-    /Audio progress/
+    /audio progress/
   );
   await expect(progressIndicator).toHaveAttribute("aria-valuemin", "0");
   await expect(progressIndicator).toHaveAttribute("aria-valuenow", "0");
